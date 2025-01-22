@@ -96,7 +96,7 @@ function App() {
                 }}
             />
 
-            {(password2Ref.current.value == passwordRef.current.value) && <p style={{ color: 'green', fontWeight: 'bold' }}>Password Matched ✅</p>}
+            {/* {(password2Ref.current.value == passwordRef.current.value) && <p style={{ color: 'green', fontWeight: 'bold' }}>Password Matched ✅</p>} */}
         </div>
     )
 }
