@@ -23,8 +23,8 @@ function App() {
     console.log('Hi')
 
 
-    const checkPassword = ()=>{
-        if(password2Ref.current.value == passwordRef.current.value){
+    const checkPassword = () => {
+        if (password2Ref.current.value == passwordRef.current.value) {
             // console.log('style',password2Ref.current.style)
             password2Ref.current.style.border = '4px solid green'
             // password2Ref.current.style.borderColor = 'green'
@@ -95,6 +95,8 @@ function App() {
                     checkPassword()
                 }}
             />
+
+            {(password2Ref.current.value == passwordRef.current.value) && <p style={{ color: 'green', fontWeight: 'bold' }}>Password Matched ✅</p>}
         </div>
     )
 }
