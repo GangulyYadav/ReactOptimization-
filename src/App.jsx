@@ -1,104 +1,148 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from "react";
 
 function App() {
-    const [password, setpassword] = useState('')
-    const [isVisible, setIsVisible] = useState(false)
+    const [categories, setCategories] = useState([]); // State to store unique categories
+    const [products, setProducts] = useState([])
+    const [selectedCategory, setSelectedCategory] = useState('')
 
-    const passwordRef = useRef(null)
-    const password2Ref = useRef(null)
+    const [isLoading, setIsLoading] = useState(false)
+    const [Error, setError] = useState('')
+    // Function to fetch products from the API
+    const fetchProducts = async () => {
+        setIsLoading(true)
+        try {
+            const response = await fetch("https://dummyjson.com/products");
+            const data = await response.json();
+            const products = data.products;
+            // setProducts(prev => [...prev,products])
+            setProducts(products)
+
+            // Extract unique categories'
+            //   const unique = [...new Set()]
+
+            // const myset = new Set(['Ganguly','Yadav','Ganguly','Yadav','Ganguly','Yadav','Ganguly','Yadav'])
+
+            // console.log('####',typeof myset)
+            // const a = []
+            // a = [...new Array([1,2,3,4])]
+
+            const uniqueCategories = [...new Set(products.map((product) => product.category))];
+            //   console.log('###',uniqueCategories)
+            setCategories(uniqueCategories);
+        } catch (error) {
+            setError(error)
+            console.error("Error fetching products:", error);
+        }
+
+        setIsLoading(false)
+
+    };
+
+    const handleCategoryChange = (cat) => {
+        // fetchProducts()
+        console.log('cat', cat)
+        setSelectedCategory(cat)
+        const newProducts = products.filter((item) => item?.category == cat.toLowerCase())
+
+        setProducts(newProducts)
+
+
+    }
 
     useEffect(() => {
-        // console.log("Page Loaded!")
-        // console.log('passwordref', passwordRef)
-        // console.log('password2ref', password2Ref)
-        if (passwordRef.current.type == 'password') {
-            passwordRef.current.type = 'text'
-        } else {
-            passwordRef.current.type = 'password'
-        }
-        // console.log(passwordRef.current.type)
-        // console.log(passwordRef.current.type)
-    }, [isVisible])
 
-    console.log('Hi')
+        fetchProducts();
+        // Fetch products on component mount
 
+    }, []);
 
-    const checkPassword = () => {
-        if (password2Ref.current.value == passwordRef.current.value) {
-            // console.log('style',password2Ref.current.style)
-            password2Ref.current.style.border = '4px solid green'
-            // password2Ref.current.style.borderColor = 'green'
-            console.log('Hurrey')
-            // password2Ref.current.style.borderColor = 'green'
-        }
+    if (Error) {
+        return (
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    backgroundColor: '#FBF5E5',
+                    width: "100vw",
+                    height: "100vh",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <p><b>Error: {Error}</b></p>
+
+            </div>
+        )
+    }
+    if (isLoading) {
+        return (
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    backgroundColor: '#FBF5E5',
+                    width: "100vw",
+                    height: "100vh",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <p><b>Loading...</b></p>
+
+            </div>
+        )
     }
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
-            {/* <label htmlFor="">Password</label>
-            <input
-                type="password"
-                name="password"
-                id="password"
-                ref={passwordRef}
-                // value={password}
-                onChange={(e) => {
-                    // setpassword(e.target.value)
-                    passwordRef.current.value = e.target.value
-                }}
-            /> */}
-
-            <label htmlFor="pass1">Password</label>
-            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 200 }}>
-
-
-
-
-                <input
-                    type="password"
-                    name="password"
-                    id="pass1"
-                    ref={passwordRef}
-                    // value={password}
-                    onChange={(e) => {
-                        // setpassword(e.target.value)
-                        passwordRef.current.value = e.target.value
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                width: "100vw",
+                height: "100vh",
+                justifyContent: "center",
+                alignItems: "center",
+            }}
+        >
+            <h1>Product Categories</h1>
+            <select name="category" id="category-dropdown" onChange={(e) => handleCategoryChange(e.target.value)} value={selectedCategory}>
+                <option value="">Select a category</option>
+                {categories.map((category, index) => (
+                    <option key={index} value={category}>
+                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                    </option>
+                ))}
+            </select>
 
 
-                    }}
-                />
-
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '5%', borderRadius: 15, backgroundColor: 'gray', width: '100%', height: '70vh', flexWrap: 'wrap', scrollBehavior: 'smooth', scrollbarColor: 'orange', overflowY: 'scroll' }} >
                 {
-                    isVisible ?
-                        <button onClick={() => setIsVisible(false)}>
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-                        :
-                        <button onClick={() => setIsVisible(true)}>
-                            <i class="fa-solid fa-eye-slash"></i>
-                        </button>
+                     products == '' && 
+                    <h3>No Products Available</h3>
                 }
 
+                {
+                    products?.map((item) => (
+                        <div style={{ width: '23%', padding: 10, margin: '2%', backgroundColor: '#CAE0BC', borderRadius: 15 }} key={item?.id}>
+                            <img src={item?.thumbnail} />
+                            <h3>{item?.title ? item.title : 'Title Not Found'}</h3>
+                            <p>{item?.description ? item.description : 'Description Not Found'}</p>
+                            <p>{item?.category ? item.category : 'Category Not Found'}</p>
+                            <h4>{item?.price ? item.price : 'FREE'}</h4>
+                            Tags: <ol>
+                                {item?.tags && item.tags?.map((titem, index) =>
+                                    <li key={index}>{titem}</li>
+                                )}
+
+                                {/* {item?.tags && item.tags     */}
+                            </ol>
+
+                        </div>
+                    ))
+                }
             </div>
-            <br /><br />
-            <label htmlFor="pass2">Confirm Password</label>
-            <input
-                type="password"
-                name="password2"
-                id="pass2"
-                ref={password2Ref}
-                // value={password}
-                onChange={(e) => {
-                    // setpassword(e.target.value)
-
-                    password2Ref.current.value = e.target.value
-                    checkPassword()
-                }}
-            />
-
-            {/* {(password2Ref.current.value == passwordRef.current.value) && <p style={{ color: 'green', fontWeight: 'bold' }}>Password Matched ✅</p>} */}
         </div>
-    )
+    );
 }
 
-export default App
+export default App;
