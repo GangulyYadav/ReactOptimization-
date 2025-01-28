@@ -3,7 +3,9 @@ import React, { useEffect, useState } from "react";
 function App() {
     const [categories, setCategories] = useState([]); // State to store unique categories
     const [products, setProducts] = useState([])
+    const [categoryWiseProducts, setCategoryWiseProducts] = useState([])
     const [selectedCategory, setSelectedCategory] = useState('')
+
 
     const [isLoading, setIsLoading] = useState(false)
     const [Error, setError] = useState('')
@@ -29,6 +31,8 @@ function App() {
             const uniqueCategories = [...new Set(products.map((product) => product.category))];
             //   console.log('###',uniqueCategories)
             setCategories(uniqueCategories);
+            setCategoryWiseProducts(products)
+
         } catch (error) {
             setError(error)
             console.error("Error fetching products:", error);
@@ -44,9 +48,11 @@ function App() {
         setSelectedCategory(cat)
         const newProducts = products.filter((item) => item?.category == cat.toLowerCase())
 
-        setProducts(newProducts)
-
-
+        if(cat=='all'){
+            setCategoryWiseProducts(products)    
+        }else{
+            setCategoryWiseProducts(newProducts)
+        }
     }
 
     useEffect(() => {
@@ -106,7 +112,8 @@ function App() {
         >
             <h1>Product Categories</h1>
             <select name="category" id="category-dropdown" onChange={(e) => handleCategoryChange(e.target.value)} value={selectedCategory}>
-                <option value="">Select a category</option>
+                <option value="all">Select a category</option>
+                {/* <option key={9} value='New Category'>New category</option> */}
                 {categories.map((category, index) => (
                     <option key={index} value={category}>
                         {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -117,12 +124,12 @@ function App() {
 
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: '5%', borderRadius: 15, backgroundColor: 'gray', width: '100%', height: '70vh', flexWrap: 'wrap', scrollBehavior: 'smooth', scrollbarColor: 'orange', overflowY: 'scroll' }} >
                 {
-                     products == '' && 
+                     categoryWiseProducts == '' && 
                     <h3>No Products Available</h3>
                 }
 
                 {
-                    products?.map((item) => (
+                    categoryWiseProducts?.map((item) => (
                         <div style={{ width: '23%', padding: 10, margin: '2%', backgroundColor: '#CAE0BC', borderRadius: 15 }} key={item?.id}>
                             <img src={item?.thumbnail} />
                             <h3>{item?.title ? item.title : 'Title Not Found'}</h3>
